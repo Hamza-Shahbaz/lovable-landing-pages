@@ -1,0 +1,130 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const navItems = [
+  { label: "Home", href: "#" },
+  { label: "About", href: "#about" },
+  { label: "Products", href: "#products" },
+  { label: "Our Clients", href: "#clients" },
+  { label: "Contact Us", href: "#contact" },
+];
+
+const Header = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 100) {
+        setIsVisible(true);
+        setIsScrolled(false);
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+        setIsScrolled(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.header
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -100, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+            isScrolled
+              ? "bg-background/95 backdrop-blur-md border-b border-border"
+              : "bg-transparent"
+          }`}
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              {/* Logo */}
+              <a href="#" className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xl">e</span>
+                </div>
+                <span className="text-foreground font-bold text-xl">ecommerce</span>
+              </a>
+
+              {/* Desktop Navigation */}
+              <nav className="hidden lg:flex items-center gap-8">
+                {navItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-foreground/80 hover:text-primary transition-colors text-sm font-medium"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+
+              {/* CTA Button */}
+              <div className="hidden lg:block">
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6">
+                  Get A Quote
+                </Button>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                className="lg:hidden text-foreground p-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="lg:hidden bg-card border-t border-border"
+                >
+                  <div className="py-4 space-y-3">
+                    {navItems.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        className="block px-4 py-2 text-foreground/80 hover:text-primary hover:bg-muted transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.label}
+                      </a>
+                    ))}
+                    <div className="px-4 pt-2">
+                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
+                        Get A Quote
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.header>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default Header;
