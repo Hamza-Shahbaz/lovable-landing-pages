@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "Home", href: "#" },
@@ -38,6 +39,8 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  console.log(window.location.href.split("/").pop());
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -48,29 +51,35 @@ const Header = () => {
           transition={{ duration: 0.3, ease: "easeOut" }}
           className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
             isScrolled
-              ? "bg-background/95 backdrop-blur-md border-b border-border"
-              : "bg-transparent"
+              ? "bg-white backdrop-blur-md shadow-xl"
+              : "bg-white"
           }`}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               {/* Logo */}
               <a href="#" className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xl">e</span>
-                </div>
-                <span className="text-foreground font-bold text-xl">ecommerce</span>
+                <img src={logo} alt="logo" className="w-full h-10" />
               </a>
 
-              {/* Desktop Navigation */}
+              {/* Desktop Navigation 
+              highliught selected item
+              when selected add underline and color to text-primary
+              underline should be yellow and should be 2px thick with space of 5px
+              new div line with yellow color and 2px thick with space of 5px only when is selected
+              */}
+
               <nav className="hidden lg:flex items-center gap-8">
                 {navItems.map((item) => (
                   <a
                     key={item.label}
                     href={item.href}
-                    className="text-foreground/80 hover:text-primary transition-colors text-sm font-medium"
+                    className={`text-foreground/80 hover:text-primary transition-colors text-sm font-medium ${item.href === window.location.href.split("/").pop() ? "text-primary" : ""}`}
                   >
                     {item.label}
+                    {item.href === window.location.href.split("/").pop() && (
+                      <div className="h-1 bg-primary w-full" />
+                    )}
                   </a>
                 ))}
               </nav>
